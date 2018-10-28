@@ -74,7 +74,8 @@ router.post('/', passport.authenticate('jwt', { session: false }, null), (req,re
         .then(profile => {
             if(profile) {
                 // This is a profile Update!
-                profile.findOneAndUpdate(
+                console.log("Updating profile");
+                Profile.findOneAndUpdate(
                     { user: req.user.id },
                     { $set: profileFields },
                     { new: true }
@@ -83,7 +84,8 @@ router.post('/', passport.authenticate('jwt', { session: false }, null), (req,re
             } else {
                 // This is a New Profile!
                 // Check if the handle exists
-                profile.findOne({ handle: profileFields.handle })
+                console.log("Creating new profile");
+                Profile.findOne({ handle: profileFields.handle })
                     .then(profile => {
                         if(profile) {
                             errors.handle = 'That handle already exists';

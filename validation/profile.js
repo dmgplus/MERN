@@ -12,14 +12,14 @@ module.exports = function validateProfileInput(data) {
         errors.handle = 'Handle must be between 2 and 40 characters';
     }
 
-    if(!Validator.isEmpty(data.handle)) {
+    if(Validator.isEmpty(data.handle)) {
         errors.handle = 'Handle is required';
     }
-    if(!Validator.isEmpty(data.status)) {
+    if(Validator.isEmpty(data.status)) {
         errors.status = 'Status is required';
     }
-    if(!Validator.isEmpty(data.skills)) {
-        errors.skills = 'skills is required';
+    if(Validator.isEmpty(data.skills)) {
+        errors.skills = 'Skills is required';
     }
 
     if(!isEmpty(data.website)){
