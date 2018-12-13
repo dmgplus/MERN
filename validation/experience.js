@@ -15,7 +15,7 @@ module.exports = function validateExpInput(data) {
         errors.company = 'Company field is required';
     }
     if(Validator.isEmpty(data.from)) {
-        errors.from = 'From Date field is required';
+        errors.from = 'From date field is required';
     }
 
     return {
