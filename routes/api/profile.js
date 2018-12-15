@@ -191,6 +191,36 @@ router.post('/experience', passport.authenticate('jwt', { session: false }, null
         .catch(e => res.status(404).json(e));
 });
 
+// @route   DELETE api/profile/experience/:exp_id
+// @desc    Delete experience from profile
+// @access  Private
+router.delete('/experience/:exp_id', passport.authenticate('jwt', { session: false }, null), (req, res) => {
+
+    Profile.findOne({ user: req.user.id })
+        .then(profile => {
+
+            const errors = {};
+
+            // Get remove index
+            const removeIndex = profile.experience
+                .map(item => item.id)
+                .indexOf(req.params.exp_id);
+
+            // Check if the education exists
+            if (removeIndex === -1) {
+                errors.notfound = 'Experience ID ' + req.params.exp_id + " not found!";
+                res.status(404).json(errors);
+            } else {
+                // Remove the experience
+                profile.experience.splice(removeIndex, 1);
+                // Save profile
+                profile.save()
+                    .then(profile => res.json(profile));
+            }
+        })
+        .catch(e => res.status(404).json(e));
+});
+
 // @route   POST api/profile/education
 // @desc    Add experience to profile
 // @access  Private
@@ -219,6 +249,36 @@ router.post('/education', passport.authenticate('jwt', { session: false }, null)
             profile.education.unshift(newEdu);
             profile.save()
                 .then(profile => res.json(profile));
+        })
+        .catch(e => res.status(404).json(e));
+});
+
+// @route   DELETE api/profile/education/:edu_id
+// @desc    Delete education from profile
+// @access  Private
+router.delete('/education/:edu_id', passport.authenticate('jwt', { session: false }, null), (req, res) => {
+
+    Profile.findOne({ user: req.user.id })
+        .then(profile => {
+
+            const errors = {};
+
+            // Get remove index
+            const removeIndex = profile.education
+                .map(item => item.id)
+                .indexOf(req.params.edu_id);
+
+            // Check if the education exists
+            if (removeIndex === -1) {
+                errors.notfound = 'Education ID ' + req.params.edu_id + " not found!";
+                res.status(404).json(errors);
+            } else {
+                // Remove the experience
+                profile.education.splice(removeIndex, 1);
+                // Save profile
+                profile.save()
+                    .then(profile => res.json(profile));
+            }
         })
         .catch(e => res.status(404).json(e));
 });
