@@ -80,4 +80,54 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }, null), (r
         })
 });
 
+// @route   POST api/posts/like/:id
+// @desc    Add a like to a post
+// @access  Private
+router.post('/like/:id', passport.authenticate('jwt', { session: false }, null), (req, res) => {
+
+    Profile.findOne({ user: req.user.id })
+        .then(() => {
+            Post.findById(req.params.id)
+                .then(post => {
+                    if(post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
+                        return res.status(400).json({ alreadyliked: 'user already liked this post' });
+                    }
+
+                    // Add user id to likes array
+                    post.likes.unshift({ user: req.user.id });
+
+                    post.save()
+                        .then(post => res.json(post));
+                })
+                .catch(e => res.status(404).json({ nopost: e }));
+        })
+});
+
+// @route   POST api/posts/unlike/:id
+// @desc    Remove a like from a post
+// @access  Private
+router.post('/unlike/:id', passport.authenticate('jwt', { session: false }, null), (req, res) => {
+
+    Profile.findOne({ user: req.user.id })
+        .then(() => {
+            Post.findById(req.params.id)
+                .then(post => {
+                    if(post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
+                        return res.status(400).json({ notliked: 'You have not yet liked this post' });
+                    }
+
+                    // Get remove index
+                    const removeIndex = post.likes
+                        .map(item => item.user.toString())
+                        .indexOf(req.user.id);
+
+                    post.likes.splice(removeIndex, 1);
+
+                    post.save()
+                        .then(post => res.json(post));
+                })
+                .catch(e => res.status(404).json({ nolike: e }));
+        })
+});
+
 module.exports = router;
