@@ -76,7 +76,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }, null), (r
                     post.remove()
                         .then(() => res.json({ success: true }));
                 })
-                .catch(e => res.status(404).json({ nopost: e }));
+                .catch(e => res.status(404).json({ nopost: "post not found", error: e }));
         })
 });
 
@@ -99,7 +99,7 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false }, null),
                     post.save()
                         .then(post => res.json(post));
                 })
-                .catch(e => res.status(404).json({ nopost: e }));
+                .catch(e => res.status(404).json({ nopost: "post not found", error: e }));
         })
 });
 
@@ -126,8 +126,38 @@ router.post('/unlike/:id', passport.authenticate('jwt', { session: false }, null
                     post.save()
                         .then(post => res.json(post));
                 })
-                .catch(e => res.status(404).json({ nolike: e }));
+                .catch(e => res.status(404).json({ nopost: "post not found", error: e }));
         })
+});
+
+// @route   POST api/posts/comment/:id
+// @desc    Add a comment to a post
+// @access  Private
+router.post('/comment/:id', passport.authenticate('jwt', { session: false }, null), (req, res) => {
+
+    const {errors, isValid} = validatePostInput(req.body);
+
+    //check validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
+    Post.findById(req.params.id)
+        .then(post => {
+            const newComment = {
+                text: req.body.text,
+                name: req.body.name,
+                avatar: req.body.avatar,
+                user: req.user.id
+            };
+
+            // Add to comments array
+            post.comments.unshift(newComment);
+
+            post.save()
+                .then(post => res.json(post));
+        })
+        .catch(e => res.status(404).json({ nopost: "post not found", error: e }));
 });
 
 module.exports = router;
