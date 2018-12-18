@@ -167,11 +167,11 @@ router.delete('/comments/:id/:comment_id', passport.authenticate('jwt', { sessio
 
     Post.findById(req.params.id)
         .then(post => {
-            // Check to see if comment exists
 
             const reqId = req.params.comment_id;
 
-            if(post.comments.filter(comment => comment._id.toString() === reqId).length() === 0) {
+            // Check to see if comment exists
+            if(post.comments.filter(comment => comment._id.toString() === reqId).length === 0) {
                 return res.status(404).json({ commentnotfound: 'Comment ' + reqId + " not found."})
             }
 
@@ -186,7 +186,7 @@ router.delete('/comments/:id/:comment_id', passport.authenticate('jwt', { sessio
             post.save()
                 .then(post => res.json(post));
         })
-        .catch(e => res.status(404).json({ nopost: "post not found", error: e }));
+        .catch(e => res.status(400).json({ error: e }));
 });
 
 module.exports = router;
